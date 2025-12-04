@@ -1,0 +1,7 @@
+starlette
+uvicorn
+fastmcp
+langchain
+requests
+httpx
+mcp[cli]
