@@ -2,7 +2,6 @@ from starlette.applications import Starlette
 from starlette. routing import Mount
 import uvicorn
 from pathlib import Path
-import os
 
 from mcp.server.fastmcp import FastMCP
 
@@ -233,6 +232,12 @@ app = Starlette(
 )
 
 if __name__ == "__main__":
-    print("Starting File Reader MCP Server. ...")
-    port = int(os.environ.get("PORT", 8000))  # Railway sets PORT env var
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    print("Starting File Reader MCP Server....")
+    print(f"Allowed directory: {ALLOWED_DIRECTORY}")
+    print("\nAvailable tools:")
+    print("  - read_file_tool: Read a single file")
+    print("  - list_files_in_directory_tool: List files in directory")
+    print("  - read_multiple_files_tool: Read all matching files")
+    print("  - search_file_content_tool: Search for text within files")
+    print(f"\nServer running at http://localhost:8000")
+    uvicorn.run(app, host="localhost", port=8000)
