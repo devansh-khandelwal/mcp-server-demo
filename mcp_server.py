@@ -7,7 +7,6 @@ from mcp.server.fastmcp import FastMCP
 
 mcp = FastMCP("FileReader")
 
-# Define the only allowed directory
 ALLOWED_DIRECTORY = Path("/home/devkhajd/mcp_server_demo/demo3/files/ieee/ieee_txt_files/"). resolve()
 
 
@@ -21,7 +20,6 @@ def is_path_allowed(file_path: str) -> tuple[bool, str]:
     try:
         path = Path(file_path). resolve()
         
-        # Check if path is within allowed directory
         if not path.is_relative_to(ALLOWED_DIRECTORY):
             return False, f"Error: Access denied.  Only files within '{ALLOWED_DIRECTORY}' are allowed."
         
@@ -43,26 +41,22 @@ async def read_file_tool(file_path: str) -> str:
         str: The contents of the file or an error message.
     """
     try:
-        # If only filename provided, prepend allowed directory
         path = Path(file_path)
         if not path.is_absolute():
             path = ALLOWED_DIRECTORY / file_path
         
         path = path.resolve()
         
-        # Security check: ensure path is allowed
         is_allowed, error_msg = is_path_allowed(str(path))
         if not is_allowed:
             return error_msg
         
-        # Check if file exists and is a file
         if not path.exists():
             return f"Error: File '{path. name}' does not exist in the allowed directory."
         
         if not path.is_file():
             return f"Error: '{path.name}' is not a file."
         
-        # Read the file
         with open(path, 'r', encoding='utf-8') as f:
             content = f.read()
         
@@ -89,31 +83,27 @@ async def list_files_in_directory_tool(subdirectory: str = "", pattern: str = "*
         str: A list of files in the directory or an error message.
     """
     try:
-        # Construct the target directory
+        
         if subdirectory:
             target_dir = (ALLOWED_DIRECTORY / subdirectory).resolve()
         else:
             target_dir = ALLOWED_DIRECTORY
         
-        # Security check: ensure path is allowed
         is_allowed, error_msg = is_path_allowed(str(target_dir))
         if not is_allowed:
             return error_msg
         
-        # Check if directory exists
         if not target_dir.exists():
             return f"Error: Subdirectory '{subdirectory}' does not exist in the allowed directory."
         
         if not target_dir.is_dir():
             return f"Error: '{subdirectory}' is not a directory."
         
-        # List files matching the pattern
         files = [f for f in target_dir. glob(pattern) if f.is_file()]
         
         if not files:
             return f"No files found matching pattern '{pattern}' in the specified directory."
         
-        # Format output
         file_list = "\n".join([f"  - {f.name} ({f.stat().st_size} bytes)" for f in sorted(files)])
         return f"Files in '{target_dir. relative_to(ALLOWED_DIRECTORY. parent)}' matching '{pattern}':\n{file_list}\n\nTotal: {len(files)} file(s)"
     
@@ -136,13 +126,12 @@ async def read_multiple_files_tool(subdirectory: str = "", pattern: str = "*") -
         str: Contents of all matching files or an error message.
     """
     try:
-        # Construct the target directory
+       
         if subdirectory:
             target_dir = (ALLOWED_DIRECTORY / subdirectory).resolve()
         else:
             target_dir = ALLOWED_DIRECTORY
         
-        # Security check
         is_allowed, error_msg = is_path_allowed(str(target_dir))
         if not is_allowed:
             return error_msg
@@ -209,7 +198,7 @@ async def search_file_content_tool(search_term: str, pattern: str = "*.txt") -> 
                 
                 if matching_lines:
                     matches_found += 1
-                    results.append(f"\n📄 {file.name}:\n" + "\n".join(matching_lines))
+                    results.append(f"\n {file.name}:\n" + "\n".join(matching_lines))
             
             except UnicodeDecodeError:
                 continue
